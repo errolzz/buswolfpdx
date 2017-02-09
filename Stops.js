@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { View, Text, TouchableHighlight } from 'react-native'
+import { View, Text, TouchableHighlight, StyleSheet } from 'react-native'
 
 export default class Stops extends Component {
 
@@ -13,32 +13,35 @@ export default class Stops extends Component {
   
   next() {
     //if on the last step, go to the timeline
-    let step === 3
+    let step = 3
 
-    if(step) {
+    console.log('NEXT!')
+
+    /*if(step) {
       this.props.navigator.push({
         name: route
       })
-    }
+    }*/
   }
 
   
   cancel() {
-
+    console.log('CANCEL!')
   }
 
 
   render() {
     return (
       <View style={styles.container}>
+        
         <Text style={styles.instructions}>BUSWOLF</Text>
 
-        <TouchableHighlight onPress={this.cancel}>
-          <Text>Cancel</Text>
+        <TouchableHighlight onPress={this.cancel} underlayColor={'transparent'} style={[styles.roundy, styles.redBorder]}>
+          <Text style={styles.redText}>NO</Text>
         </TouchableHighlight>
 
-        <TouchableHighlight onPress={this.next}>
-          <Text>Next</Text>
+        <TouchableHighlight onPress={this.next} underlayColor={'transparent'} style={[styles.roundy, styles.greenBorder]}>
+          <Text style={styles.greenText}>YES</Text>
         </TouchableHighlight>
       </View>
     )
@@ -46,7 +49,7 @@ export default class Stops extends Component {
 }
 
 Stops.propTypes = {
-  navigator: React.PropTypes.element
+  navigator: React.PropTypes.object
 }
 
 const styles = StyleSheet.create({
@@ -54,16 +57,31 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: 'white',
   },
-  welcome: {
-    fontSize: 20,
+  roundy: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    borderWidth: 2
+  },
+  redBorder: {
+    borderColor: 'red'
+  },
+  greenBorder: {
+    borderColor: 'green'
+  },
+  redText: {
     textAlign: 'center',
-    margin: 10,
+    color: 'red'
+  },
+  greenText: {
+    textAlign: 'center',
+    color: 'green'
   },
   instructions: {
     textAlign: 'center',
-    color: '#333333',
+    color: 'red',
     marginBottom: 5,
   },
 })

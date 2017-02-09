@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react'
-import { AppRegistry, StyleSheet, Text, View } from 'react-native'
+import { AppRegistry, StyleSheet, Text, View, Navigator } from 'react-native'
 import Stops from './Stops.js'
 
 export default class BusWolfPDX extends Component {
