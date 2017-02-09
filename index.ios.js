@@ -4,30 +4,35 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import React, { Component } from 'react'
+import { AppRegistry, StyleSheet, Text, View } from 'react-native'
+import Stops from './Stops.js'
 
 export default class BusWolfPDX extends Component {
+
+  constructor(props) {
+    super(props)
+    this.renderScene = this.renderScene.bind(this)
+  }
+
+
+  renderScene(route, navigator) {
+    if(route.name == 'Stops') {
+      return <Stops navigator={navigator} />
+    }
+    if(route.name == 'Timeline') {
+      return <Timeline navigator={navigator} />
+    }
+  }
+
+
   render() {
     return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          BUS WOLF!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
-        </Text>
-      </View>
-    );
+      <Navigator
+        style={{ flex:1 }}
+        initialRoute={{ name: 'Stops' }}
+        renderScene={ this.renderScene } />
+    )
   }
 }
 
@@ -48,6 +53,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 5,
   },
-});
+})
 
-AppRegistry.registerComponent('BusWolfPDX', () => BusWolfPDX);
+AppRegistry.registerComponent('BusWolfPDX', () => BusWolfPDX)
