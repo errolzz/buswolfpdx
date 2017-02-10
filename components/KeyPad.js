@@ -30,8 +30,12 @@ export default class KeyPad extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.keyRow}>{this.keys(0, 5)}</View>
-        <View style={styles.keyRow}>{this.keys(5, 10)}</View>
+        <View style={styles.spacer}></View>
+        <View style={styles.holder}>
+          <View style={styles.keyRow}>{this.keys(0, 5)}</View>
+          <View style={styles.keyRow}>{this.keys(5, 10)}</View>
+        </View>
+        <View style={styles.spacer}></View>
       </View>
     )
   }
@@ -43,14 +47,19 @@ React.propTypes = {
 
 const styles = StyleSheet.create({
   container: {
+    flexDirection: 'row',
     height: 120,
-    flexDirection: 'column',
-    alignItems: 'center',
     marginBottom: 40
+  },
+  holder: {
+    flex: 0.9,
+    flexDirection: 'column'
+  },
+  spacer: {
+    flex: 0.05
   },
   keyRow: {
     height: 60,
-    width: 300,
     flexDirection: 'row'
   },
   button: {

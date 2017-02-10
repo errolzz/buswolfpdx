@@ -20,7 +20,9 @@ export default class Stops extends Component {
 
     this.state = {
       step: 0,
-      stopId: ''
+      stopId: '',
+      stopData: undefined,
+      error: false
     }
   }
 
@@ -29,11 +31,16 @@ export default class Stops extends Component {
   //enter > confirm > enter > confirm > route to timeline screen
   next() {
     //if on the last step, go to the timeline
-    let nextStep = this.state.step < 3 ? this.state.step + 1 : this.state.step
-
+    let nextStep = this.state.step < 4 ? this.state.step + 1 : this.state.step
+    
     if(nextStep === 1 || nextStep === 3) {
       //user entered stop id
       this.verifyStopId(nextStep)
+    } else if(nextStep === 2) {
+      this.setState({
+        stopId: '',
+        step: nextStep
+      })
     } else {
       //setup complete, move to timeline screen
       this.props.navigator.push({
@@ -78,7 +85,8 @@ export default class Stops extends Component {
 
   keyPress(value) {
     this.setState({
-      stopId: this.state.stopId + value
+      stopId: this.state.stopId + value,
+      error: false
     })
   }
 
@@ -87,7 +95,8 @@ export default class Stops extends Component {
     numbers = numbers.substring(0, numbers.length - 1)
 
     this.setState({
-      stopId: numbers
+      stopId: numbers,
+      error: false
     })
   }
 
@@ -110,12 +119,12 @@ export default class Stops extends Component {
   getEnterStopView() {
     //unique error styling for invalid stop id
     let stopIdStyles = [styles.stopId]
-    if(this.state.error) stopIdStyles.push(styles.redText)
+    if(this.state.error) stopIdStyles.push(STYLE.redText)
 
     return (
       <View style={styles.enterStop}>
         <TouchableHighlight onPress={this.backspace} underlayColor={'transparent'}>
-          <Text style={styles.stopId}>{this.state.stopId}</Text>
+          <Text style={stopIdStyles}>{this.state.stopId}</Text>
         </TouchableHighlight>
 
         <KeyPad select={this.keyPress} />
@@ -173,7 +182,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: STYLE.inactive,
     marginTop: 70,
-    marginBottom: 16,
+    marginBottom: 10,
     fontFamily: 'Avenir',
     fontWeight: '800',
     letterSpacing: 0.6,
@@ -196,7 +205,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Avenir',
     fontWeight: '800',
     fontSize: 100,
-    height: 136,
+    height: 130,
     textAlign: 'center',
     color: STYLE.white
   },
