@@ -6,6 +6,7 @@ export const API = {
 }
 
 export const ROUTES = {
+  SPLASH: 'Splash',
   STOPS: 'Stops',
   TIMELINE: 'Timeline'
 }

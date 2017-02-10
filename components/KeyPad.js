@@ -48,15 +48,14 @@ React.propTypes = {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 120,
-    marginBottom: 40
+    height: 120
   },
   holder: {
-    flex: 0.9,
+    flex: 0.92,
     flexDirection: 'column'
   },
   spacer: {
-    flex: 0.05
+    flex: 0.04
   },
   keyRow: {
     height: 60,
