@@ -6,7 +6,8 @@
 
 import React, { Component } from 'react'
 import { AppRegistry, StyleSheet, Text, View, Navigator } from 'react-native'
-import Stops from './Stops.js'
+import { ROUTES } from './constants.js'
+import Stops from './components/Stops.js'
 
 export default class BusWolfPDX extends Component {
 
@@ -17,10 +18,10 @@ export default class BusWolfPDX extends Component {
 
 
   renderScene(route, navigator) {
-    if(route.name == 'Stops') {
+    if(route.name == ROUTES.STOPS) {
       return <Stops navigator={navigator} />
     }
-    if(route.name == 'Timeline') {
+    if(route.name == ROUTES.TIMELINE) {
       return <Timeline navigator={navigator} />
     }
   }
@@ -30,7 +31,7 @@ export default class BusWolfPDX extends Component {
     return (
       <Navigator
         style={{ flex:1 }}
-        initialRoute={{ name: 'Stops' }}
+        initialRoute={{ name: ROUTES.STOPS }}
         renderScene={ this.renderScene } />
     )
   }
