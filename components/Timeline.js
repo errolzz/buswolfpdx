@@ -91,7 +91,23 @@ export default class Timeline extends Component {
         {header}
 
         <View style={styles.map}>
+          <View style={styles.track}></View>
 
+          <View style={styles.node, styles.nodeNow}>
+            <View style={[styles.circle, style.filled]}></View>
+          </View>
+
+          <View style={[styles.node, styles.nodeNext]}>
+            <Text style={[styles.time, styles.white]}></Text>
+            <View style={styles.circle}></View>
+            <Text style={[styles.mins, styles.white]}></Text>
+          </View>
+
+          <View style={[styles.node, styles.nodeLast]}>
+            <Text style={[styles.time, styles.white]}></Text>
+            <View style={styles.circle}></View>
+            <Text style={[styles.mins, styles.white]}></Text>
+          </View>
         </View>
 
         <View style={styles.weather}>
@@ -124,6 +140,13 @@ const styles = StyleSheet.create({
     marginLeft: 30,
     marginRight: 30
   },
+  node: {
+
+  },
+  circle: {
+
+  },
+
   map: {
     flex: 0.54
   },
