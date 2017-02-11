@@ -8,8 +8,8 @@ import React, { Component } from 'react'
 import { AppRegistry, StyleSheet, Text, View, Navigator, AsyncStorage } from 'react-native'
 import { ROUTES } from './constants.js'
 import Splash from './components/Splash.js'
-import Stops from './components/Stops.js'
-import Timeline from './components/Timeline.js'
+import Setup from './components/Setup.js'
+import StopInfo from './components/StopInfo.js'
 
 
 export default class BusWolfPDX extends Component {
@@ -23,11 +23,11 @@ export default class BusWolfPDX extends Component {
     if(route.name == ROUTES.SPLASH) {
       return <Splash navigator={navigator} />
     }
-    if(route.name == ROUTES.STOPS) {
-      return <Stops navigator={navigator} />
+    if(route.name == ROUTES.SETUP) {
+      return <Setup navigator={navigator} />
     }
-    if(route.name == ROUTES.TIMELINE) {
-      return <Timeline navigator={navigator} stops={route.stops} />
+    if(route.name == ROUTES.STOP_INFO) {
+      return <StopInfo navigator={navigator} stops={route.stops} />
     }
   }
 

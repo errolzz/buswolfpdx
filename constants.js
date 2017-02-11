@@ -7,20 +7,20 @@ export const API = {
 
 export const ROUTES = {
   SPLASH: 'Splash',
-  STOPS: 'Stops',
-  TIMELINE: 'Timeline'
+  SETUP: 'Setup',
+  STOP_INFO: 'StopInfo'
 }
 
 export const COPY = {
-  STOPS_TOP_TEXT: [
+  SETUP_TOP_TEXT: [
     'FIRST STOP ID',
     'CONFIRM FIRST STOP',
     'SECOND STOP ID',
     'CONFIRM SECOND STOP'
   ],
-  STOPS_NEXT: 'NEXT',
-  STOPS_CONFIRM_YES: 'YES',
-  STOPS_CONFIRM_NO: 'NO'
+  SETUP_NEXT: 'NEXT',
+  SETUP_CONFIRM_YES: 'YES',
+  SETUP_CONFIRM_NO: 'NO'
 }
 
 export const STYLE = {

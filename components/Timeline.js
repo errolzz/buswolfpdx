@@ -1,183 +1,163 @@
 import React, { Component, PropTypes } from 'react'
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native'
-import { STYLE, ROUTES, COPY, API } from '../constants.js'
-import { getStopDetails, getDistance, getCurrentLocation } from '../services.js'
+import moment from 'moment'
+import { View, Text, TouchableHighlight, StyleSheet, Dimensions } from 'react-native'
+import { STYLE } from '../constants.js'
 
 export default class Timeline extends Component {
 
   constructor(props) {
     super(props)
 
-    this.getClosestStop = this.getClosestStop.bind(this)
-    this.refresh = this.refresh.bind(this)
-    this.back = this.back.bind(this)
+    this.nodes = this.nodes.bind(this)
+    this.getTimeScale = this.getTimeScale.bind(this)
+  }
 
-    this.state = {
-      stopId: undefined,
-      closestStop: undefined,
-      stopData: undefined
+  time(date) {
+    return moment(date).format('h:mm A')
+  }
+
+
+  wait(date) {
+    let now = moment()
+    let arrival = moment(date)
+    let duration = arrival.diff(now, 'm')
+    let message
+
+    switch(duration) {
+      case duration < 1:
+        message = 'DUE'
+        break
+      case duration === 1:
+        message = '1 MIN'
+        break
+      default:
+        message = duration + ' MINS'
     }
+
+    return {duration: duration, message: message}
   }
 
-  componentDidMount() {
-    let _this = this
 
-    this.getClosestStop((stopData) => {
-      this.setState({
-        closestStop: stopData.id
-      })
+  //build a bus node with time, circle, and wait
+  nodes(arrivals, scale) {
+    return arrivals.map((arrival, i) => {
+      let t = this.time(arrival.estimated)
+      let w = this.wait(arrival.estimated).message
+      let screenSize = Dimensions.get('window')
 
-      //start refresh interval
-      this.interval = setInterval(this.refresh, 15000)
-      //initial data
-      setTimeout(this.refresh, 200)
+      let position = {
+
+      }
+
+      let textStyle = i === 0 ? styles.whiteText : undefined
+      let borderStyle = i === 0 ? styles.whiteBorder : undefined
+
+      return (
+        <View style={[styles.node, position]} key={i}>
+          <View style={styles.labelHolder}>
+            <Text style={[styles.time, styles.label, styles.rightAlign, textStyle]}>{t}</Text>
+          </View>
+          <View style={[styles.circle, borderStyle]}></View>
+          <View style={styles.labelHolder}>
+            <Text style={[styles.mins, styles.label, textStyle]}>{w}</Text>
+          </View>
+        </View>
+      )
     })
   }
 
-  //gets the closest stop based on current lat lng location
-  getClosestStop(done) {
-    let _this = this
-    getCurrentLocation((loc) => {
-      let distanceToFirst = getDistance(_this.props.stops[0].lat, _this.props.stops[0].lng, loc.lat, loc.lng)
-      let distanceToSecond = getDistance(_this.props.stops[1].lat, _this.props.stops[1].lng, loc.lat, loc.lng)
 
-      done(distanceToFirst < distanceToSecond ? _this.props.stops[0] : _this.props.stops[1])
+  //calc how long the track needs to represent in 30 increment minutes
+  getTimeScale(arrivals) {
+    //the duration of the longest wait
+    let longest = 0
+
+    //get the arrival with the longest wait time
+    arrivals.forEach((item) => {
+      longest = Math.max(this.wait(item.estimated).duration, longest)
     })
-  }
 
-  refresh() {
-    let _this = this
-
-    getStopDetails(this.state.closestStop)
-      .then((data) => {
-        if(data) {
-          //valid stop id
-          _this.setState({
-            stopData: data
-          })
-        } else {
-          //invalid stop id
-          _this.setState({
-            error: true
-          })
-        }
-      })
-  }
-
-
-  back() {
-    this.props.navigator.push({
-      name: ROUTES.STOPS
-    })
+    return Math.ceil(longest / 30) * 30
   }
 
 
   render() {
-    let header
-    if(this.state.stopData) {
-      let address = this.state.stopData.location[0].desc.toUpperCase()
-      let dir = '- ' + this.state.stopData.location[0].dir.toUpperCase() + ' -'
+    //sort arrivals by estimated arrival time (lowest first)
+    let arrivals = this.props.data.arrival.sort((a, b) => {
+      return a - b
+    })
+    let timeScale = this.getTimeScale(arrivals)
+    let nodes = this.nodes(arrivals, timeScale)
 
-      header = (
-        <View style={styles.header}>
-          <Text style={styles.topText}>{address}</Text>
-          <Text style={styles.topTextTwo}>{dir}</Text>
-        </View>
-      )
+    let screenSize = Dimensions.get('window')
+    console.log('screenSize '+screenSize)
+
+    centerTrack = {
+      left: screenSize.width / 2 - 1.5
     }
 
     return (
       <View style={styles.container}>
-        {header}
+        <View style={[styles.track, centerTrack]}></View>
 
-        <View style={styles.map}>
-          <View style={styles.track}></View>
-
-          <View style={styles.node, styles.nodeNow}>
-            <View style={[styles.circle, style.filled]}></View>
-          </View>
-
-          <View style={[styles.node, styles.nodeNext]}>
-            <Text style={[styles.time, styles.white]}></Text>
-            <View style={styles.circle}></View>
-            <Text style={[styles.mins, styles.white]}></Text>
-          </View>
-
-          <View style={[styles.node, styles.nodeLast]}>
-            <Text style={[styles.time, styles.white]}></Text>
-            <View style={styles.circle}></View>
-            <Text style={[styles.mins, styles.white]}></Text>
-          </View>
+        <View style={styles.node}>
+          <View style={[styles.circle, styles.nowCircle]}></View>
         </View>
 
-        <View style={styles.weather}>
-
-        </View>
-        
-        <View style={styles.backHolder}>
-          <TouchableHighlight onPress={this.back} underlayColor={'transparent'}>
-            <Text style={styles.back}>BACK</Text>
-          </TouchableHighlight>
-        </View>
+        {nodes}
       </View>
     )
   }
 }
 
-Timeline.propTypes = {
-  navigator: React.PropTypes.object,
-  stops: React.PropTypes.array
-}
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    flexGrow: 1,
-    backgroundColor: STYLE.background
+    flex: 1
   },
-  header: {
-    flex: 0.22,
-    marginLeft: 30,
-    marginRight: 30
+  track: {
+    width: 3,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    backgroundColor: STYLE.inactive
   },
   node: {
-
+    flexDirection: 'row',
+    justifyContent: 'center'
+  },
+  rightAlign: {
+    textAlign: 'right'
+  },
+  labelHolder: {
+    width: 130
+  },
+  label: {
+    fontFamily: 'Avenir',
+    fontWeight: '600',
+    letterSpacing: 0.6,
+    fontSize: 18,
+    color: STYLE.inactive
   },
   circle: {
-
+    backgroundColor: STYLE.background,
+    width: 16,
+    height: 16,
+    borderWidth: 2,
+    borderRadius: 8,
+    borderColor: STYLE.inactive,
+    marginRight: 14,
+    marginLeft: 14,
+    marginTop: 3.4
   },
-
-  map: {
-    flex: 0.54
+  nowCircle: {
+    backgroundColor: STYLE.inactive,
+    borderColor: STYLE.inactive,
+    marginTop: 0
   },
-  weather: {
-    flex: 0.12
+  whiteText: {
+    color: STYLE.white
   },
-  backHolder: {
-    flex: 0.12
-  },
-  topText: {
-    textAlign: 'center',
-    color: STYLE.inactive,
-    paddingTop: 66,
-    fontFamily: 'Avenir',
-    fontWeight: '800',
-    letterSpacing: 0.6,
-    fontSize: 18
-  },
-  topTextTwo: {
-    textAlign: 'center',
-    color: STYLE.inactive,
-    fontFamily: 'Avenir',
-    fontSize: 15,
-    textAlign: 'center',
-    marginLeft: 30,
-    letterSpacing: 0.6,
-    marginRight: 30,
-    fontWeight: '600'
-  },
-  back: {
-    color: 'white',
-    textAlign: 'center'
+  whiteBorder: {
+    borderColor: STYLE.white
   }
 })

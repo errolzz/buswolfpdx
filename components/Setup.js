@@ -4,7 +4,7 @@ import { STYLE, ROUTES, COPY, API } from '../constants.js'
 import { getStopDetails, saveStops } from '../services.js'
 import KeyPad from './KeyPad.js'
 
-export default class Stops extends Component {
+export default class Setup extends Component {
 
   constructor(props) {
     super(props)
@@ -42,7 +42,7 @@ export default class Stops extends Component {
       let confirmed = {
         id: this.state.stopData.id,
         lat: this.state.stopData.lat,
-        lgn: this.state.stopData.lng
+        lng: this.state.stopData.lng
       }
 
       //save first stop, clear stop display, go next
@@ -58,7 +58,7 @@ export default class Stops extends Component {
       let confirmed = {
         id: this.state.stopData.id,
         lat: this.state.stopData.lat,
-        lgn: this.state.stopData.lng
+        lng: this.state.stopData.lng
       }
 
       //the new stops to save
@@ -70,7 +70,7 @@ export default class Stops extends Component {
       //setup complete, move to timeline screen
       setTimeout(() => {
         this.props.navigator.push({
-          name: ROUTES.TIMELINE,
+          name: ROUTES.STOP_INFO,
           stops: stopsToSave
         })
       }, 300)
@@ -158,7 +158,7 @@ export default class Stops extends Component {
       next = (
         <View style={styles.nextHolder}>
           <TouchableHighlight onPress={this.next} underlayColor={'transparent'} style={[styles.roundButton, STYLE.greenBorder]}>
-            <Text style={[styles.buttonValue, STYLE.greenText]}>{COPY.STOPS_NEXT}</Text>
+            <Text style={[styles.buttonValue, STYLE.greenText]}>{COPY.SETUP_NEXT}</Text>
           </TouchableHighlight>
         </View>
       )
@@ -193,11 +193,11 @@ export default class Stops extends Component {
         </View>
         <View style={styles.confirmActions}>
           <TouchableHighlight onPress={this.cancel} underlayColor={'transparent'} style={[styles.roundButton, STYLE.redBorder]}>
-            <Text style={[styles.buttonValue, STYLE.redText]}>{COPY.STOPS_CONFIRM_NO}</Text>
+            <Text style={[styles.buttonValue, STYLE.redText]}>{COPY.SETUP_CONFIRM_NO}</Text>
           </TouchableHighlight>
 
           <TouchableHighlight onPress={this.next} underlayColor={'transparent'} style={[styles.roundButton, STYLE.greenBorder]}>
-            <Text style={[styles.buttonValue, STYLE.greenText]}>{COPY.STOPS_CONFIRM_YES}</Text>
+            <Text style={[styles.buttonValue, STYLE.greenText]}>{COPY.SETUP_CONFIRM_YES}</Text>
           </TouchableHighlight>
         </View>
       </View>
@@ -209,7 +209,7 @@ export default class Stops extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.topText}>{COPY.STOPS_TOP_TEXT[this.state.step]}</Text>
+          <Text style={styles.topText}>{COPY.SETUP_TOP_TEXT[this.state.step]}</Text>
         </View>
         {this.getSetupView()}
       </View>
@@ -217,7 +217,7 @@ export default class Stops extends Component {
   }
 }
 
-Stops.propTypes = {
+Setup.propTypes = {
   navigator: React.PropTypes.object
 }
 

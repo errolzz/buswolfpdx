@@ -68,7 +68,7 @@ export default class Splash extends Component {
 
   routeWithStops(hasValidStops, stops) {
     //default to either stops or timeline based on if stops are already saved
-    let route = hasValidStops ? ROUTES.TIMELINE : ROUTES.STOPS
+    let route = hasValidStops ? ROUTES.STOP_INFO : ROUTES.SETUP
 
     setTimeout(() => {
       this.props.navigator.push({
