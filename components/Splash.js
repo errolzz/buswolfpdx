@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, StatusBar } from 'react-native'
 import { getSavedStops, getStopDetails } from '../services.js'
 import { ROUTES, STYLE } from '../constants.js'
 
@@ -81,6 +81,7 @@ export default class Splash extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
         <Text style={styles.logo}>BUS WOLF PDX</Text>
       </View>
     )

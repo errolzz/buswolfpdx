@@ -1,8 +1,10 @@
 
 let TRIMET_APP_ID = '048A702DCBC791CACA54AE4B5'
+let WEATHER_APP_ID = 'e00252cdb80ea68e108a14782282bc00'
 
 export const API = {  
-  TRIMET_ARRIVALS_FOR: 'https://developer.trimet.org/ws/v2/arrivals?appID=' + TRIMET_APP_ID + '&locIDs='
+  TRIMET_ARRIVALS_FOR: 'https://developer.trimet.org/ws/v2/arrivals?appID=' + TRIMET_APP_ID + '&locIDs=',
+  CURRENT_WEATHER_FOR: 'http://api.openweathermap.org/data/2.5/weather?units=imperial&appid=' + WEATHER_APP_ID
 }
 
 export const ROUTES = {

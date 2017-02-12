@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
-import { View, Text, TouchableHighlight, StyleSheet } from 'react-native'
+import { View, Text, TouchableHighlight, StyleSheet, StatusBar } from 'react-native'
 import { STYLE, ROUTES, COPY, API } from '../constants.js'
-import { getStopDetails, getDistance, getCurrentLocation } from '../services.js'
+import { getStopDetails, getDistance, getCurrentLocation, getCurrentWeather } from '../services.js'
 import Timeline from './Timeline.js'
 
 export default class StopInfo extends Component {
@@ -11,11 +11,15 @@ export default class StopInfo extends Component {
 
     this.getClosestStop = this.getClosestStop.bind(this)
     this.refresh = this.refresh.bind(this)
+    this.weather = this.weather.bind(this)
     this.back = this.back.bind(this)
 
     this.state = {
       stopId: undefined,
-      stopData: undefined
+      stopData: undefined,
+      weatherCondition: undefined,
+      weatherTemperature: undefined,
+      weatherSet: false
     }
   }
 
@@ -23,13 +27,13 @@ export default class StopInfo extends Component {
     let _this = this
 
     //start refresh interval
-    this.interval = setInterval(this.refresh, 15000)
+    this.arrivalInterval = setInterval(this.refresh, 15000)
     
     //initial data
     this.refresh()
 
-    //get weather
-    this.weather()
+    //start weather interval
+    this.weatherInterval = setInterval((this.weather), 60000)
   }
 
 
@@ -51,6 +55,15 @@ export default class StopInfo extends Component {
               error: true
             })
           }
+
+          //if needed, get initial weather
+          if(!this.state.weatherSet) {
+            console.log('INITIAL WEATHER')
+            this.setState({
+              weatherSet: true
+            })
+            setTimeout(this.weather, 500)
+          }
         })
     })
   }
@@ -70,23 +83,47 @@ export default class StopInfo extends Component {
   //go back to the setup flow
   back() {
     //stop the refresh
-    clearInterval(this.interval)
+    clearInterval(this.arrivalInterval)
+    clearInterval(this.weatherInterval)
 
     //switch to stops screen
     this.props.navigator.push({
-      name: ROUTES.STOPS
+      name: ROUTES.SETUP
     })
   }
 
 
   //gets the weather
   weather() {
+    getCurrentWeather(this.state.stopData.location[0].lat, this.state.stopData.location[0].lng)
+      .then((data) => {
+        this.setState({
+          weatherCondition: data.weather[0].main.toUpperCase(),
+          weatherTemperature: Math.round(Number(data.main.temp))
+        })
+      })
+  }
 
+
+  //gets a color based on temperature
+  getTempColor(temp) {
+    if(temp < 30) {
+      return '#a4a4ff' //ice blue
+    } else if(temp < 44) {
+      return '#63aee0' //light blue
+    } else if(temp < 60) {
+      return '#aeaeae' //gray
+    } else if(temp < 84) {
+      return '#f58343' //orange
+    } else {
+      return STYLE.red //red
+    }
   }
 
 
   render() {
     let header
+    //if there is a header
     if(this.state.stopData) {
       let address = this.state.stopData.location[0].desc.toUpperCase()
       let dir = '- ' + this.state.stopData.location[0].dir.toUpperCase() + ' -'
@@ -99,23 +136,42 @@ export default class StopInfo extends Component {
       )
     }
 
+    let weather
+    if(this.state.weatherTemperature) {
+      //get the temp color
+      let tempColor = this.getTempColor(this.state.weatherTemperature)
+
+      weather = (
+        <View style={styles.weather}>
+          <View style={{marginRight: 5}}>
+            <Text style={styles.condition}>{this.state.weatherCondition}</Text>
+          </View>
+          <View style={{marginLeft: 5}}>
+            <Text style={[styles.temperature, {color: tempColor}]}>{this.state.weatherTemperature + 'F'}</Text>
+          </View>
+        </View>
+      )
+    }
+
+    //if there is a timeline
     let timeline = this.state.stopData ? <Timeline data={this.state.stopData} /> : undefined
 
     return (
       <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
         {header}
 
         <View style={styles.timeline}>
           {timeline}
         </View>
 
-        <View style={styles.weather}>
-
+        <View style={styles.weatherHolder}>
+          {weather}
         </View>
         
         <View style={styles.backHolder}>
-          <TouchableHighlight onPress={this.back} underlayColor={'transparent'}>
-            <Text style={styles.back}>BACK</Text>
+          <TouchableHighlight onPress={this.back} underlayColor={'transparent'} style={styles.touchBack}>
+            <Text style={styles.innerBack}>X</Text>
           </TouchableHighlight>
         </View>
       </View>
@@ -140,13 +196,34 @@ const styles = StyleSheet.create({
     marginRight: 30
   },
   timeline: {
-    flex: 0.54
+    flex: 0.5
   },
-  weather: {
-    flex: 0.12
+  weatherHolder: {
+    flex: 0.16,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   backHolder: {
-    flex: 0.12
+    flex: 0.12,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  weather: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  condition: {
+    fontFamily: 'Avenir',
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    fontSize: 18,
+    color: STYLE.white
+  },
+  temperature: {
+    fontFamily: 'Avenir',
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    fontSize: 18
   },
   topText: {
     textAlign: 'center',
@@ -168,8 +245,17 @@ const styles = StyleSheet.create({
     marginRight: 30,
     fontWeight: '600'
   },
-  back: {
-    color: 'white',
-    textAlign: 'center'
+  touchBack: {
+    width: 60, 
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  innerBack: {
+    fontFamily: 'Helvetica',
+    fontWeight: '200',
+    fontSize: 18,
+    textAlign: 'center',
+    color: STYLE.inactive
   }
 })

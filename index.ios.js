@@ -5,7 +5,7 @@
  */
 
 import React, { Component } from 'react'
-import { AppRegistry, StyleSheet, Text, View, Navigator, AsyncStorage } from 'react-native'
+import { AppRegistry, StyleSheet, Text, View, Navigator } from 'react-native'
 import { ROUTES } from './constants.js'
 import Splash from './components/Splash.js'
 import Setup from './components/Setup.js'

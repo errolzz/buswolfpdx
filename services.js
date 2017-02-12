@@ -4,13 +4,27 @@ import { API } from './constants'
 
 //get arrivals from trimet api
 export function getStopDetails(stopId) {
+  console.log(API.TRIMET_ARRIVALS_FOR + stopId)
   return fetch(API.TRIMET_ARRIVALS_FOR + stopId)
     .then((response) => response.json())
     .then((responseJson) => {
       return responseJson.resultSet
     })
     .catch((error) => {
-      //nope
+      console.log(error)
+    })
+}
+
+
+//gets the weather
+export function getCurrentWeather(lat, lng) {
+  return fetch(API.CURRENT_WEATHER_FOR + '&lat=' + lat + '&lon=' + lng)
+    .then((response) => response.json())
+    .then((responseJson) => {
+      return responseJson
+    })
+    .catch((error) => {
+      console.log(error)
     })
 }
 

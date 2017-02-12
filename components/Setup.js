@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react'
-import { View, Text, TouchableHighlight, StyleSheet, AsyncStorage } from 'react-native'
+import { View, Text, TouchableHighlight, StyleSheet, StatusBar } from 'react-native'
 import { STYLE, ROUTES, COPY, API } from '../constants.js'
 import { getStopDetails, saveStops } from '../services.js'
 import KeyPad from './KeyPad.js'
@@ -208,6 +208,7 @@ export default class Setup extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <StatusBar barStyle="light-content" />
         <View style={styles.header}>
           <Text style={styles.topText}>{COPY.SETUP_TOP_TEXT[this.state.step]}</Text>
         </View>

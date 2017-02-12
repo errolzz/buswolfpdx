@@ -9,7 +9,6 @@ export default class Timeline extends Component {
     super(props)
 
     this.nodes = this.nodes.bind(this)
-    this.getTimeScale = this.getTimeScale.bind(this)
   }
 
   time(date) {
@@ -20,18 +19,15 @@ export default class Timeline extends Component {
   wait(date) {
     let now = moment()
     let arrival = moment(date)
-    let duration = arrival.diff(now, 'm')
+    let duration = Math.max(0, Number(arrival.diff(now, 'm')))
     let message
 
-    switch(duration) {
-      case duration < 1:
-        message = 'DUE'
-        break
-      case duration === 1:
-        message = '1 MIN'
-        break
-      default:
-        message = duration + ' MINS'
+    if(duration < 1) {
+      message = 'DUE'
+    } else if(duration === 1) {
+      message = '1 MIN'
+    } else {
+      message = duration + ' MINS'
     }
 
     return {duration: duration, message: message}
@@ -40,14 +36,21 @@ export default class Timeline extends Component {
 
   //build a bus node with time, circle, and wait
   nodes(arrivals, scale) {
-    return arrivals.map((arrival, i) => {
+    let nodeFlexs = []
+    let nodes = arrivals.map((arrival, i) => {
       let t = this.time(arrival.estimated)
       let w = this.wait(arrival.estimated).message
-      let screenSize = Dimensions.get('window')
+      let duration = this.wait(arrival.estimated).duration
+
+      if(i === 1) {
+        duration -= this.wait(arrivals[0].estimated).duration
+      }
 
       let position = {
-
+        flex: duration / scale
       }
+
+      nodeFlexs.push(duration / scale)
 
       let textStyle = i === 0 ? styles.whiteText : undefined
       let borderStyle = i === 0 ? styles.whiteBorder : undefined
@@ -64,47 +67,65 @@ export default class Timeline extends Component {
         </View>
       )
     })
-  }
 
+    let totalNodeFlex = 0
+    for(let i=0; i<nodeFlexs.length; i++) {
+      totalNodeFlex += nodeFlexs[i]
+    }
 
-  //calc how long the track needs to represent in 30 increment minutes
-  getTimeScale(arrivals) {
-    //the duration of the longest wait
-    let longest = 0
+    let spacer = (
+      <View style={{flex: 1 - totalNodeFlex}} key={3}>
+      </View>
+    )
 
-    //get the arrival with the longest wait time
-    arrivals.forEach((item) => {
-      longest = Math.max(this.wait(item.estimated).duration, longest)
-    })
-
-    return Math.ceil(longest / 30) * 30
+    nodes.push(spacer)
+    return nodes
   }
 
 
   render() {
+    let timeScale = 30 //minutes
+
+    //console.log(this.props.data)
+    if(!this.props.data.arrival) {
+      return (
+        <View style={styles.noBusContainer}>
+          <Text style={styles.noBus}>SCHEDULE UNAVAILABLE</Text>
+        </View>
+      )
+    }
+
     //sort arrivals by estimated arrival time (lowest first)
     let arrivals = this.props.data.arrival.sort((a, b) => {
       return a - b
     })
-    let timeScale = this.getTimeScale(arrivals)
-    let nodes = this.nodes(arrivals, timeScale)
+    //make sure the bus is actually there
+    arrivals = arrivals.filter((item) => {
+      let wait = this.wait(item.estimated).duration <= timeScale
+      return item.vehicleID && item.departed && wait
+    })
 
+    
+    let nodes = this.nodes(arrivals, timeScale)
     let screenSize = Dimensions.get('window')
-    console.log('screenSize '+screenSize)
 
     centerTrack = {
       left: screenSize.width / 2 - 1.5
+    }
+    centerNow = {
+      left: screenSize.width / 2 - 8
     }
 
     return (
       <View style={styles.container}>
         <View style={[styles.track, centerTrack]}></View>
 
-        <View style={styles.node}>
+        <View style={[styles.now, centerNow]}>
           <View style={[styles.circle, styles.nowCircle]}></View>
         </View>
-
-        {nodes}
+        <View style={{flex:1}}>
+          {nodes}
+        </View>
       </View>
     )
   }
@@ -121,9 +142,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     backgroundColor: STYLE.inactive
   },
+  now: {
+    position: 'absolute',
+    top: 0
+  },
   node: {
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    alignItems: 'flex-end'
   },
   rightAlign: {
     textAlign: 'right'
@@ -147,17 +173,30 @@ const styles = StyleSheet.create({
     borderColor: STYLE.inactive,
     marginRight: 14,
     marginLeft: 14,
-    marginTop: 3.4
+    bottom: 5
   },
   nowCircle: {
     backgroundColor: STYLE.inactive,
     borderColor: STYLE.inactive,
-    marginTop: 0
+    marginRight: 0,
+    marginLeft: 0,
   },
   whiteText: {
     color: STYLE.white
   },
   whiteBorder: {
     borderColor: STYLE.white
+  },
+  noBusContainer: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  noBus: {
+    textAlign: 'center',
+    fontFamily: 'Avenir',
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    fontSize: 20,
+    color: STYLE.red
   }
 })
