@@ -58,7 +58,6 @@ export default class StopInfo extends Component {
 
           //if needed, get initial weather
           if(!this.state.weatherSet) {
-            console.log('INITIAL WEATHER')
             this.setState({
               weatherSet: true
             })
@@ -191,15 +190,15 @@ const styles = StyleSheet.create({
     backgroundColor: STYLE.background
   },
   header: {
-    flex: 0.22,
+    flex: 0.28,
     marginLeft: 30,
     marginRight: 30
   },
   timeline: {
-    flex: 0.5
+    flex: 0.46
   },
   weatherHolder: {
-    flex: 0.16,
+    flex: 0.14,
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -210,7 +209,7 @@ const styles = StyleSheet.create({
   },
   weather: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   condition: {
     fontFamily: 'Avenir',

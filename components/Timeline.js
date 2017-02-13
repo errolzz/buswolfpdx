@@ -47,7 +47,7 @@ export default class Timeline extends Component {
       }
 
       let position = {
-        flex: duration / scale
+        flex: Math.max(0.1, duration / scale)
       }
 
       nodeFlexs.push(duration / scale)
