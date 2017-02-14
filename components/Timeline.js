@@ -99,11 +99,22 @@ export default class Timeline extends Component {
     let arrivals = this.props.data.arrival.sort((a, b) => {
       return a - b
     })
+
     //make sure the bus is actually there
     arrivals = arrivals.filter((item) => {
-      let wait = this.wait(item.estimated).duration <= timeScale
-      return item.vehicleID && item.departed && wait
+      let withinTimeScale = this.wait(item.estimated).duration <= timeScale
+      let inFuture = this.wait(item.estimated).duration >= 0 
+      return withinTimeScale && inFuture
     })
+
+    //no buses in time
+    if(arrivals.length === 0) {
+      return (
+        <View style={styles.noBusContainer}>
+          <Text style={styles.noBus}>NO BUSES FOR{"\n"}30+ MINUTES</Text>
+        </View>
+      ) 
+    }
 
     
     let nodes = this.nodes(arrivals, timeScale)
